@@ -1,0 +1,25 @@
+# Dependencies
+node_modules/
+.host/node_modules/
+
+# Build output
+src-tauri/target/
+src-tauri/resources/host/
+dist/
+
+# Node / npm
+.npm-cache/
+npm-debug.log*
+
+# Tauri / Rust
+src-tauri/gen/
+
+# Editors / OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# Env
+.env
+.env.local

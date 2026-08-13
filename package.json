@@ -1,0 +1,23 @@
+{
+  "name": "dsh-desktop",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "DeepSeek Harness desktop client — Tauri shell over the dsh web host",
+  "scripts": {
+    "host:install": "pnpm -C host install --prod",
+    "host:fetch-node": "node scripts/fetch-node.mjs",
+    "host:bundle": "node scripts/bundle-host.mjs",
+    "smoke": "node scripts/smoke-host.mjs",
+    "tauri": "tauri",
+    "dev": "npm run host:bundle && tauri dev",
+    "build": "npm run host:bundle && tauri build",
+    "build:debug": "npm run host:bundle && tauri build --debug"
+  },
+  "devDependencies": {
+    "@tauri-apps/cli": "^2.5.0"
+  },
+  "engines": {
+    "node": "^22.19.0 || >=24.0.0"
+  }
+}

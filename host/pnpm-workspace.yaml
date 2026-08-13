@@ -1,0 +1,23 @@
+# pnpm 11 settings (package.json "pnpm" field and most .npmrc keys are no
+# longer read; settings live here).
+#
+# Flat (hoisted) node_modules: bundle-host copies this tree verbatim into the
+# Tauri resources. The default isolated linker would leave a symlink web into
+# .pnpm that cannot survive the copy, and would duplicate the store.
+nodeLinker: hoisted
+# These packages run legitimate postinstall steps (prebuilt native binaries,
+# chmod of the node-pty spawn helper, codegen); everything else stays blocked.
+allowBuilds:
+  '@deepseek-ai/dsh-subprocess-local': true
+  '@google/genai': true
+  koffi: true
+  node-pty: true
+  protobufjs: true
+
+# The dsh family is published together at rc.6 (2026-08-13); the default
+# minimum-release-age supply-chain gate would reject every one of them. They
+# are the very packages this app wraps, so the age gate is disabled.
+minimumReleaseAge: 0
+
+# Non-interactive module-dir purges (no TTY in scripts/CI).
+confirmModulesPurge: false

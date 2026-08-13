@@ -1,0 +1,61 @@
+name: ci
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  host-smoke:
+    name: Host boot smoke (keyless)
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 11
+
+      - name: Install host dependencies (@deepseek-ai/dsh)
+        run: pnpm -C host install --prod
+
+      - name: Boot the web profile and probe the served shell HTML
+        run: node scripts/smoke-host.mjs
+        env:
+          DSH_DESKTOP_SMOKE_TIMEOUT_MS: "180000"
+
+  cargo-check:
+    name: cargo check
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-22.04, windows-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Linux Tauri prerequisites
+        if: matrix.os == 'ubuntu-22.04'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libwebkit2gtk-4.1-dev build-essential curl wget file \
+            libxdo-dev libssl-dev libayatana-appindicator3-dev librsvg2-dev
+
+      - name: Setup Rust
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Rust cache
+        uses: swatinem/rust-cache@v2
+        with:
+          workspaces: "./src-tauri -> target"
+
+      # build.rs accepts host/main.mjs from the checkout, so no host assembly
+      # is needed for cargo check.
+      - name: cargo check
+        run: cargo check --manifest-path src-tauri/Cargo.toml --all-targets

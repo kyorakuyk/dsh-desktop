@@ -1,0 +1,10 @@
+{
+  "name": "dsh-desktop-host",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Node host sidecar for dsh-desktop: boots the DeepSeek Harness web profile in-process",
+  "dependencies": {
+    "@deepseek-ai/dsh": "0.1.0-rc.6"
+  }
+}

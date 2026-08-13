@@ -1,0 +1,97 @@
+name: release
+
+on:
+  push:
+    tags:
+      - "v*"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - platform: "macos-latest"
+            args: "--target aarch64-apple-darwin"
+            targets: "aarch64-apple-darwin"
+            nodeArch: "arm64"
+          - platform: "macos-latest"
+            args: "--target x86_64-apple-darwin"
+            targets: "x86_64-apple-darwin"
+            nodeArch: "x64"
+          - platform: "ubuntu-22.04"
+            args: ""
+            targets: ""
+            nodeArch: ""
+          - platform: "windows-latest"
+            args: "--bundles nsis"
+            targets: ""
+            nodeArch: ""
+
+    runs-on: ${{ matrix.platform }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Linux Tauri prerequisites
+        if: matrix.platform == 'ubuntu-22.04'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libwebkit2gtk-4.1-dev build-essential curl wget file \
+            libxdo-dev libssl-dev libayatana-appindicator3-dev librsvg2-dev
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 11
+
+      - name: Setup Rust
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: ${{ matrix.targets }}
+
+      - name: Rust cache
+        uses: swatinem/rust-cache@v2
+        with:
+          workspaces: "./src-tauri -> target"
+
+      - name: Install root dependencies (tauri CLI)
+        run: npm ci
+
+      - name: Install host dependencies (@deepseek-ai/dsh)
+        run: pnpm -C host install --prod
+
+      - name: Assemble bundled host (Node runtime + dsh packages)
+        run: node scripts/bundle-host.mjs
+        env:
+          DSH_DESKTOP_NODE_ARCH: ${{ matrix.nodeArch }}
+
+      - name: Build and publish to GitHub Releases
+        uses: tauri-apps/tauri-action@v0
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tagName: v__VERSION__
+          releaseName: "dsh-desktop v__VERSION__"
+          releaseBody: |
+            DeepSeek Harness 桌面客户端。
+
+            ## 安装
+            - Windows: 下载并运行 `dsh-desktop_<version>_x64-setup.exe`
+            - macOS: 下载 `dsh-desktop_<version>_aarch64.dmg`（Apple Silicon）或 `x64.dmg`（Intel）
+            - Linux: 下载 `dsh-desktop_<version>_amd64.AppImage` / `.deb`
+
+            首次启动需要数秒装配主机服务；模型调用请在 设置 → 模型 中配置 API Key。
+          releaseDraft: true
+          prerelease: false
+          publish: true
+          args: ${{ matrix.args }}

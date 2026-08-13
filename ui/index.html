@@ -1,0 +1,119 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>DeepSeek Harness Desktop</title>
+    <style>
+      :root {
+        color-scheme: dark;
+      }
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+      html,
+      body {
+        height: 100%;
+      }
+      body {
+        background: #0d1117;
+        color: #e6edf3;
+        font-family: "Segoe UI", "PingFang SC", "Microsoft YaHei", system-ui, sans-serif;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 24px;
+        user-select: none;
+      }
+      .logo {
+        width: 96px;
+        height: 96px;
+        border-radius: 22px;
+        background: linear-gradient(135deg, #4d6bfe 0%, #6f8bff 55%, #4d6bfe 100%);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 10px 40px rgba(77, 107, 254, 0.35);
+        animation: breathe 2.2s ease-in-out infinite;
+      }
+      .logo svg {
+        width: 56px;
+        height: 56px;
+      }
+      @keyframes breathe {
+        0%,
+        100% {
+          transform: scale(1);
+          opacity: 1;
+        }
+        50% {
+          transform: scale(1.04);
+          opacity: 0.9;
+        }
+      }
+      h1 {
+        font-size: 20px;
+        font-weight: 600;
+        letter-spacing: 0.02em;
+      }
+      .status {
+        font-size: 13px;
+        color: #8b949e;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+      .spinner {
+        width: 12px;
+        height: 12px;
+        border: 2px solid rgba(139, 148, 158, 0.35);
+        border-top-color: #8b949e;
+        border-radius: 50%;
+        animation: spin 0.9s linear infinite;
+      }
+      @keyframes spin {
+        to {
+          transform: rotate(360deg);
+        }
+      }
+      .hint {
+        font-size: 12px;
+        color: #484f58;
+        max-width: 420px;
+        text-align: center;
+        line-height: 1.6;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="logo" aria-hidden="true">
+      <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path
+          d="M4 7c0-1.1.9-2 2-2h12a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V7Z"
+          stroke="white"
+          stroke-width="1.6"
+          stroke-linejoin="round"
+        />
+        <path
+          d="M8 9.5 6 12l2 2.5M16 9.5 18 12l-2 2.5M13.2 8.5l-2.4 7"
+          stroke="white"
+          stroke-width="1.6"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        />
+      </svg>
+    </div>
+    <h1>DeepSeek Harness Desktop</h1>
+    <div class="status">
+      <div class="spinner"></div>
+      <span id="status">正在启动主机服务…</span>
+    </div>
+    <div class="hint">
+      首次启动需要数秒装配 DeepSeek Harness 插件树（约 30 个插件行 + 前端模块预取）。
+      若长时间停留在此页，请查看应用日志。
+    </div>
+  </body>
+</html>

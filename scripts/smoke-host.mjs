@@ -21,8 +21,9 @@ const timeoutMs = Number(process.env.DSH_DESKTOP_SMOKE_TIMEOUT_MS ?? 120_000)
 
 const bundled = join(root, 'src-tauri', 'resources', 'host')
 const useBundled = existsSync(join(bundled, 'node_modules')) && existsSync(join(bundled, 'main.mjs'))
-const nodeExe = process.platform === 'win32' ? 'node.exe' : 'node'
-const nodeBin = useBundled ? join(bundled, 'node', nodeExe) : process.execPath
+// Runtime binary path inside node/: node.exe on Windows, bin/node elsewhere.
+const nodeRuntimeRel = process.platform === 'win32' ? join('node.exe') : join('bin', 'node')
+const nodeBin = useBundled ? join(bundled, 'node', nodeRuntimeRel) : process.execPath
 const hostEntry = useBundled ? join(bundled, 'main.mjs') : join(root, 'host', 'main.mjs')
 
 const URL_LINE = /dsh web: (https?:\/\/127\.0\.0\.1:\d+)/

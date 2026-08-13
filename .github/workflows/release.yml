@@ -93,5 +93,4 @@ jobs:
             首次启动需要数秒装配主机服务；模型调用请在 设置 → 模型 中配置 API Key。
           releaseDraft: true
           prerelease: false
-          publish: true
           args: ${{ matrix.args }}

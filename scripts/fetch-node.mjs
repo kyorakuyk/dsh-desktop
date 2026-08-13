@@ -76,13 +76,13 @@ async function main() {
     console.log('[fetch-node] skipped (DSH_DESKTOP_SKIP_NODE)')
     return
   }
-  const exe = process.platform === 'win32' ? 'node.exe' : 'node'
-  if (existsSync(join(NODE_DIR, exe))) {
-    console.log(`[fetch-node] runtime already present: ${join(NODE_DIR, exe)}`)
-    return
-  }
   const version = await latestV22()
   const spec = platformSpec(version, process.env.DSH_DESKTOP_NODE_ARCH)
+  const runtimePath = join(NODE_DIR, spec.exe)
+  if (existsSync(runtimePath)) {
+    console.log(`[fetch-node] runtime already present: ${runtimePath}`)
+    return
+  }
   const url = `https://nodejs.org/dist/v${version}/${spec.file}`
   console.log(`[fetch-node] ${spec.file} (${spec.arch})`)
   const tmp = join(root, '.tmp-node')
@@ -94,8 +94,8 @@ async function main() {
   mkdirSync(NODE_DIR, { recursive: true })
   cpSync(extracted, NODE_DIR, { recursive: true })
   rmSync(tmp, { recursive: true, force: true })
-  const sizeMb = (statSync(join(NODE_DIR, exe)).size / 1024 / 1024).toFixed(1)
-  console.log(`[fetch-node] runtime ready: ${join(NODE_DIR, exe)} (${sizeMb} MB)`)
+  const sizeMb = (statSync(runtimePath).size / 1024 / 1024).toFixed(1)
+  console.log(`[fetch-node] runtime ready: ${runtimePath} (${sizeMb} MB)`)
 }
 
 main().catch((error) => {

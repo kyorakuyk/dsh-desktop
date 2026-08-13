@@ -14,7 +14,9 @@ import { fileURLToPath } from 'node:url'
 const root = fileURLToPath(new URL('..', import.meta.url))
 const srcHost = join(root, 'host')
 const outHost = join(root, 'src-tauri', 'resources', 'host')
-const nodeExe = process.platform === 'win32' ? 'node.exe' : 'node'
+// Runtime binary path inside node/: node.exe on Windows, bin/node elsewhere.
+const nodeRuntimeRel = process.platform === 'win32' ? join('node.exe') : join('bin', 'node')
+const nodeRuntime = () => join(outHost, 'node', nodeRuntimeRel)
 
 function sizeMb(dir) {
   let total = 0
@@ -46,13 +48,13 @@ cpSync(join(srcHost, 'main.mjs'), join(outHost, 'main.mjs'))
 
 // 2. Node runtime.
 if (process.env.DSH_DESKTOP_SKIP_NODE !== undefined && process.env.DSH_DESKTOP_SKIP_NODE !== '') {
-  if (!existsSync(join(outHost, 'node', nodeExe))) {
+  if (!existsSync(nodeRuntime())) {
     fail('node runtime missing and DSH_DESKTOP_SKIP_NODE is set — run `npm run host:fetch-node` or unset the env')
   }
 } else {
   const { execFileSync } = await import('node:child_process')
   execFileSync(process.execPath, [join(root, 'scripts', 'fetch-node.mjs')], { stdio: 'inherit' })
-  if (!existsSync(join(outHost, 'node', nodeExe))) {
+  if (!existsSync(nodeRuntime())) {
     fail('node runtime still missing after fetch-node — check scripts/fetch-node.mjs')
   }
 }

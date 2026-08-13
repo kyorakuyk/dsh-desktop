@@ -55,7 +55,14 @@ jobs:
         with:
           workspaces: "./src-tauri -> target"
 
-      # build.rs accepts host/main.mjs from the checkout, so no host assembly
-      # is needed for cargo check.
+      # tauri-build validates the bundle.resources glob at build time; a fresh
+      # checkout has no resources/host, so seed one file (build.rs also accepts
+      # host/main.mjs from the checkout).
+      - name: Seed minimal host for the resources glob
+        run: |
+          mkdir -p src-tauri/resources/host
+          cp host/main.mjs src-tauri/resources/host/main.mjs
+        shell: bash
+
       - name: cargo check
         run: cargo check --manifest-path src-tauri/Cargo.toml --all-targets

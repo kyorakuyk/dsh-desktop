@@ -66,8 +66,13 @@ npm run tauri dev
 
 ```sh
 npm run build             # 先 bundle host，再 tauri build
-# 产物: src-tauri/target/release/bundle/nsis/*.exe （Windows）
+# Windows 产物: src-tauri/target/release/bundle/nsis/*.exe
+# macOS 产物:  bundle/macos/*.app + bundle/dmg/*.dmg
+# Linux 产物:  bundle/deb/*.deb + bundle/rpm/*.rpm
 ```
+
+> Linux 上如需跳过 AppImage（当前 CI 中 linuxdeploy 打包失败，见已知限制），
+> 使用 `npx tauri build --bundles deb,rpm`。
 
 ## 发布到 GitHub
 
@@ -106,6 +111,8 @@ npm run build             # 先 bundle host，再 tauri build
 - 主机异常退出时窗口停留在最后页面；日志位于系统日志目录（tauri-plugin-log）。
 - Linux 构建需要 WebKitGTK 系统依赖；详见
   [Tauri prerequisites](https://tauri.app/start/prerequisites/)。
+- Linux AppImage 暂不提供：CI 中 `linuxdeploy` 打包失败（与本地 deb/rpm 无关，
+  属于 AppImage 工具链问题），后续版本修复。
 
 ## License
 

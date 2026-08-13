@@ -24,7 +24,7 @@ jobs:
             targets: "x86_64-apple-darwin"
             nodeArch: "x64"
           - platform: "ubuntu-22.04"
-            args: ""
+            args: "--bundles deb,rpm"
             targets: ""
             nodeArch: ""
           - platform: "windows-latest"
@@ -88,7 +88,7 @@ jobs:
             ## 安装
             - Windows: 下载并运行 `dsh-desktop_<version>_x64-setup.exe`
             - macOS: 下载 `dsh-desktop_<version>_aarch64.dmg`（Apple Silicon）或 `x64.dmg`（Intel）
-            - Linux: 下载 `dsh-desktop_<version>_amd64.AppImage` / `.deb`
+            - Linux: 下载 `dsh-desktop_<version>_amd64.deb`（Debian/Ubuntu）或 `.rpm`（Fedora/RHEL）
 
             首次启动需要数秒装配主机服务；模型调用请在 设置 → 模型 中配置 API Key。
           releaseDraft: true

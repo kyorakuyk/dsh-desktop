@@ -7,7 +7,7 @@
  *
  * Run `npm run host:install` first so `host/node_modules` exists.
  */
-import { cpSync, existsSync, mkdirSync, readdirSync, statSync } from 'node:fs'
+import { cpSync, existsSync, lstatSync, mkdirSync, readdirSync } from 'node:fs'
 import { join } from 'node:path'
 import { fileURLToPath } from 'node:url'
 
@@ -23,7 +23,8 @@ function sizeMb(dir) {
   const walk = (p) => {
     for (const entry of readdirSync(p)) {
       const full = join(p, entry)
-      const st = statSync(full)
+      // lstat: symlinks (and their dangling targets) are counted, never resolved.
+      const st = lstatSync(full)
       if (st.isDirectory()) walk(full)
       else total += st.size
     }

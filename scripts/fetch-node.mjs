@@ -71,6 +71,20 @@ async function extract(archive, dir) {
   }
 }
 
+/** Remove the npm/npx/corepack CLI tree and its bin symlinks: the harness only
+ * needs the `node` binary itself, so this trims ~30 MB and leaves node/ free
+ * of symlinks (which tauri resource packing and directory walks handle
+ * poorly). Only applies to the unix layout (Windows has no bin symlinks). */
+function pruneNodeDistribution() {
+  const targets = [
+    ['bin', 'npm'], ['bin', 'npx'], ['bin', 'corepack'],
+    ['lib', 'node_modules', 'npm'], ['lib', 'node_modules', 'npx'], ['lib', 'node_modules', 'corepack'],
+  ]
+  for (const segments of targets) {
+    rmSync(join(NODE_DIR, ...segments), { recursive: true, force: true })
+  }
+}
+
 async function main() {
   if (process.env.DSH_DESKTOP_SKIP_NODE !== undefined && process.env.DSH_DESKTOP_SKIP_NODE !== '') {
     console.log('[fetch-node] skipped (DSH_DESKTOP_SKIP_NODE)')
@@ -80,6 +94,7 @@ async function main() {
   const spec = platformSpec(version, process.env.DSH_DESKTOP_NODE_ARCH)
   const runtimePath = join(NODE_DIR, spec.exe)
   if (existsSync(runtimePath)) {
+    pruneNodeDistribution()
     console.log(`[fetch-node] runtime already present: ${runtimePath}`)
     return
   }
@@ -94,6 +109,7 @@ async function main() {
   mkdirSync(NODE_DIR, { recursive: true })
   cpSync(extracted, NODE_DIR, { recursive: true })
   rmSync(tmp, { recursive: true, force: true })
+  pruneNodeDistribution()
   const sizeMb = (statSync(runtimePath).size / 1024 / 1024).toFixed(1)
   console.log(`[fetch-node] runtime ready: ${runtimePath} (${sizeMb} MB)`)
 }
